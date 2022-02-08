@@ -13,6 +13,7 @@ const DATABSE_URI = process.env.MONGODB_URI.replace('password', encodeURICompone
 mongoose.connect(DATABSE_URI, options)
     // eslint-disable-next-line no-unused-vars
     .then( (db) => {
+        require('./seeders')
         createLog('info', 'Connection has been established successfully.', undefined);
     }).catch(error => {
         parseMongooseError(error);
