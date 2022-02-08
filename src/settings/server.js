@@ -1,7 +1,7 @@
 const router = require('./router');
 
 require('dotenv').config();
-
+require('../db');
 
 module.exports = (app) => {
 
