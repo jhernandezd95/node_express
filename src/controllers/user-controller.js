@@ -29,8 +29,6 @@ const _filterParams = (params) => {
       } // key - value
     })
 
-    filter.deletedAt = { $exists: false };
-
     return filter;
 }
 
@@ -49,9 +47,7 @@ async function update(req, res){
     try {
         const params = _updateParams(req.body);
         const id = req.params.id? req.params.id : req.user.id;
-        const user = await UserModel.findOneAndUpdate(
-            {_id: id, deletedAt: {$exists: false}}, 
-            {$set: params}, {new: true});
+        const user = await UserModel.findOneAndUpdate({_id: id}, {$set: params}, {new: true});
         if(!user){
             const errorParse = parseMongooseError({name: 'NotModified'}, req);
             res.status(errorParse.code).send(errorParse);
@@ -67,7 +63,7 @@ async function update(req, res){
 async function changeRole(req, res){
     try {
         const result = await UserModel.updateOne(
-            {_id: req.params.id, deletedAt: {$exists: false}},
+            {_id: req.params.id},
             {role: req.body.role});
         if(result.modifiedCount === 0){
             const errorParse = parseMongooseError({name: 'NotModified'}, req);
@@ -84,7 +80,7 @@ async function changeRole(req, res){
 
 async function changeStatus(req, res){
     try {
-        const user = await UserModel.findOne({_id: req.params.id, deletedAt: {$exists: false}});
+        const user = await UserModel.findOne({_id: req.params.id});
         if(!user){
             const errorParse = parseMongooseError({name: 'NotFound'}, req)
             res.status(errorParse.code).send(errorParse);
@@ -110,7 +106,7 @@ async function getAll(req, res){
                                 .skip(skip)
                                 .limit(limit)
                                 .sort(sort);
-        const total = await UserModel.countDocuments({deletedAt: { $exists: false }});
+        const total = await UserModel.countDocuments({});
         const totalMatched = await UserModel.countDocuments(filter);
         res.status(200).send({users: result, length: totalMatched, total});
     } catch (error) {

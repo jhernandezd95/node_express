@@ -22,6 +22,35 @@ const UserModel = new Schema(
   { timestamps: true }
 );
 
+const typesFindQueryMiddleware = [
+  'count',
+  'find',
+  'findOne',
+  'findOneAndDelete',
+  'findOneAndRemove',
+  'findOneAndUpdate',
+  'update',
+  'updateOne',
+  'updateMany',
+  'countDocuments'
+];
+
+const excludeInFindQueriesIsDeleted = async function (next) {
+  this.where({ deletedAt: { $exists: false } });
+  next();
+};
+
+typesFindQueryMiddleware.forEach((type) => {
+  UserModel.pre(type, excludeInFindQueriesIsDeleted);
+});
+
+const excludeInDeletedInAggregateMiddleware = async function (next) {
+  this.pipeline().unshift({ $match: {  deletedAt: { $exists: false } } });
+  next();
+};
+
+UserModel.pre('aggregate', excludeInDeletedInAggregateMiddleware);
+
 UserModel.pre('save', function(next) {
   const user = this;
 
