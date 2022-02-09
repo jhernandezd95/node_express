@@ -3,6 +3,7 @@ const {Schema} = mongoose;
 const uniqueValidator = require('mongoose-unique-validator');
 const RoleModel = require('./role-model');
 const {hashPassword} = require('../../helpers/utils');
+const bcrypt = require('bcrypt');
 
 require('dotenv').config();
 
